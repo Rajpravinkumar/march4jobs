@@ -1,25 +1,73 @@
-import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  selectEmail,
+  selectPassword,
+  setEmail,
+  setPassword,
+} from "../redux/features/auth/registerSlice";
+import { toast } from "react-toastify";
+import { replace, useNavigate } from "react-router";
+import authServices from "../services/authServices";
+
 const Login = () => {
-    return (
-      <div className="mx-auto mt-20 p-4 border rounded max-w-xs">
-        <h2 className="mb-4 text-xl">Login</h2>
-        <form className="flex flex-col space-y-3" >
-          <input
-            name="email"
-            type="email"
-            placeholder="Email"
-            className="p-2 border rounded" />
-          <input
-            name="password"
-            type="password"
-            placeholder="Password"
-            className="p-2 border rounded"
-            
-          />
-          <button className="bg-blue-500 py-2 rounded text-white">Login</button>
-        </form>
-      </div>
-    );
+  const email = useSelector(selectEmail);
+  const password = useSelector(selectPassword);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await authServices.login({ email, password });
+
+      if (response.status === 200) {
+        toast.success("Logged in successfully");
+
+        // call the authLoader to get the user data
+
+        const response = await authServices.me();
+        dispatch(setUser(response.data));
+
+        //clear the form
+        dispatch(setEmail(" "));
+        dispatch(setPassword(" "));
+
+        // redirect the home page
+        setTimeout(() => {
+          navigate("/", { replace: true });
+        }, 500);
+      }
+    } catch (error) {
+      toast.error(error.responce.data.message);
+    }
+  };
+
+  return (
+    <div className="mx-auto mt-20 p-4 border rounded max-w-xs">
+      <h2 className="mb-4 text-xl">Login</h2>
+      <form className="flex flex-col space-y-3" onSubmit={handleLogin}>
+        <input
+          name="email"
+          type="email"
+          placeholder="Email"
+          className="p-2 border rounded"
+          value={email}
+          onChange={(e) => dispatch(setEmail(e.target.value))}
+        />
+        <input
+          name="password"
+          type="password"
+          placeholder="Password"
+          className="p-2 border rounded"
+          value={password}
+          onChange={(e) => dispatch(setPassword(e.target.value))}
+        />
+        <button className="bg-blue-500 py-2 rounded text-white">Login</button>
+      </form>
+    </div>
+  );
 };
 
 export default Login;
