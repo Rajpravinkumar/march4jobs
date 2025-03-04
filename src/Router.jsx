@@ -1,14 +1,16 @@
 import { createBrowserRouter } from "react-router";
 import App from "./App";
-import { Children } from "react";
+import JobList from "./pages/JobList";
 const routes = [
   {
     path: "/",
-        element: <App />,
-        Children:[ {
-        
-        }
-    ]
+    element: <App />,
+    children: [
+      {
+        path: "",
+        element:<JobList/>,
+      },
+    ],
   },
 ];
 
