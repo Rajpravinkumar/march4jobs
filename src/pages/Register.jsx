@@ -7,20 +7,48 @@ import {
   setName,
   setPassword
 } from "../redux/features/auth/registerSlice";
-
+import { toast } from "react-toastify";
+import authServices from "../services/authServices";
+import { useNavigate } from "react-router";
+ 
 const Register = () => {
   const name = useSelector(selectName);
   const email = useSelector(selectEmail);
   const password = useSelector(selectPassword);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    console.log("Registering.....");
-    console.log(name, email, password)
-  };
+    toast.success('Registering...');
 
+    //call the register function from the authServices
+    try {
+
+      const response = await authServices.register({ name, email, password });
+
+      if (response.status === 201) {
+        toast.success('Registered successfully');
+
+        // clear the force
+        dispatch(setName(''));
+        dispatch(setEmail(''));
+        dispatch(setPassword(''));
+
+        // Redirect to the logic page 
+        setTimeout(
+          () => {
+        navigate('/login');
+      }, 500);
+
+      }
+    } catch (error){
+      toast.error(error.response.data.message);
+      
+    }
+  
+  }
   return (
     <div className="mx-auto mt-20 p-4 border rounded max-w-xs">
       <h2 className="mb-4 text-xl">Candidate Registration</h2>
