@@ -1,15 +1,12 @@
 import { useDispatch, useSelector } from "react-redux";
-import {
-  selectEmail,
-  selectPassword,
-  setEmail,
-  setPassword,
-} from "../redux/features/auth/registerSlice";
+import { selectEmail, selectPassword,  setEmail,  setPassword } from "../redux/features/auth/loginSlice";
+
 import { toast } from "react-toastify";
-import { replace, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import authServices from "../services/authServices";
 
 const Login = () => {
+
   const email = useSelector(selectEmail);
   const password = useSelector(selectPassword);
 
@@ -18,51 +15,48 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
     try {
-      const response = await authServices.login({ email, password });
+      const response = await authServices.login({
+        email, password
+      });
 
       if (response.status === 200) {
-        toast.success("Logged in successfully");
+        toast.success('Logged in successfully');
 
-        // call the authLoader to get the user data
+        //clear the form 
+        dispatch(setEmail(''));
+        dispatch(setPassword(''));
 
-        const response = await authServices.me();
-        dispatch(setUser(response.data));
-
-        //clear the form
-        dispatch(setEmail(" "));
-        dispatch(setPassword(" "));
-
-        // redirect the home page
+        // redirect to the home page
         setTimeout(() => {
-          navigate("/", { replace: true });
-        }, 500);
+          navigate('/');
+        }, 500);  
       }
     } catch (error) {
-      toast.error(error.responce.data.message);
+      toast.error(error.response.data.message);
     }
-  };
+  }
 
-  return (
+return (
     <div className="mx-auto mt-20 p-4 border rounded max-w-xs">
       <h2 className="mb-4 text-xl">Login</h2>
       <form className="flex flex-col space-y-3" onSubmit={handleLogin}>
         <input
-          name="email"
-          type="email"
-          placeholder="Email"
-          className="p-2 border rounded"
-          value={email}
-          onChange={(e) => dispatch(setEmail(e.target.value))}
+        name="email"
+        type="email"
+        placeholder="Email"
+        className="p-2 border rounded"
+        value={email}
+        onChange={e => dispatch(setEmail(e.target.value))}
         />
         <input
           name="password"
           type="password"
           placeholder="Password"
-          className="p-2 border rounded"
-          value={password}
-          onChange={(e) => dispatch(setPassword(e.target.value))}
+        className="p-2 border rounded"
+        value={password}
+        onChange={e => dispatch(setPassword(e.target.value))}
+          
         />
         <button className="bg-blue-500 py-2 rounded text-white">Login</button>
       </form>
