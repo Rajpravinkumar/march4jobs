@@ -1,6 +1,14 @@
-import { Link } from "react-router"
+import { useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router"
+import { selectUser } from "../redux/features/auth/userSlice";
 
 const Layout = ({ children }) => {
+ 
+  
+  const navigate = useNavigate();
+  const user = useSelector(selectUser);
+
+
   return (
     <div className="flex flex-col min-h-screen">
       <nav className="flex justify-between bg-gray-900 p-4 text-white">
@@ -8,12 +16,57 @@ const Layout = ({ children }) => {
           <Link to="/" className="mr-4">
             Home
           </Link>
-          <Link to="/register" className="mr-4">
-            Register
-          </Link>
-          <Link to="/login" className="mr-4">
-            Login
-          </Link>
+          {!user && (
+            <Link to="/register" className="mr-4">
+              Register
+            </Link>
+          )}
+          {!user && (
+            <Link to="/login" className="mr-4">
+              Login
+            </Link>
+          )}
+          {user && user.role === "user" && (
+            <>
+              <Link to="/candidate/dashboard" className="mr-4">
+                Dashboard
+              </Link>
+              <Link to="/candidate/profile" className="mr-4">
+                Profile
+              </Link>
+              <Link to="/candidate/applications" className="mr-4">
+                Applications{" "}
+              </Link>
+            </>
+          )}
+
+          {user && user.role === "recruiter" && (
+            <>
+              <Link to="/recruiter/dashboard" className="mr-4">
+                Dashboard
+              </Link>
+              <Link to="/recruiter/profile" className="mr-4">
+                Profile
+              </Link>
+              <Link to="/recruiter/create-job" className="mr-4">
+                Create Job
+              </Link>
+              <Link to="/recruiter/manage-applications" className="mr-4">
+                Manage Applications
+              </Link>
+            </>
+          )}
+        </div>
+
+        <div>
+          {user && (
+            <button
+              className="bg-red-500 px-3 py-1 rounded"
+              onClick={() => navigate("/logout" , {replace: true})}
+            >
+              Logout
+            </button>
+          )}
         </div>
       </nav>
 
